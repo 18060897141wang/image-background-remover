@@ -1,0 +1,27 @@
+{
+  "name": "image-background-remover",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "preview": "npm run build && wrangler pages dev out",
+    "deploy": "npm run build && wrangler pages deploy out --project-name image-background-remover"
+  },
+  "dependencies": {
+    "next": "^16.2.10",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260715.1",
+    "@tailwindcss/postcss": "4.1.11",
+    "@types/node": "22.10.7",
+    "@types/react": "19.1.8",
+    "@types/react-dom": "19.1.6",
+    "tailwindcss": "4.1.11",
+    "typescript": "5.7.3",
+    "wrangler": "^4.110.0"
+  }
+}

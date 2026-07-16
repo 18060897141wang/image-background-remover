@@ -1,5 +1,6 @@
 "use client";
 
+import Script from "next/script";
 import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -33,6 +34,36 @@ const faqs = [
   }
 ];
 
+interface User {
+  id: string;
+  email: string;
+  name: string | null;
+  picture: string | null;
+}
+
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        id: {
+          initialize: (config: {
+            client_id: string;
+            callback: (response: { credential?: string }) => void;
+          }) => void;
+          renderButton: (
+            parent: HTMLElement,
+            options: {
+              theme: "outline" | "filled_blue" | "filled_black";
+              size: "large" | "medium" | "small";
+              width?: number;
+            }
+          ) => void;
+        };
+      };
+    };
+  }
+}
+
 function validateFile(file: File) {
   if (!SUPPORTED_TYPES.has(file.type)) {
     return "Please upload a JPG, PNG, or WebP image.";
@@ -47,11 +78,14 @@ function validateFile(file: File) {
 
 export default function Home() {
   const inputRef = useRef<HTMLInputElement>(null);
+  const googleButtonRef = useRef<HTMLDivElement>(null);
   const [file, setFile] = useState<File | null>(null);
   const [sourceUrl, setSourceUrl] = useState("");
   const [resultUrl, setResultUrl] = useState("");
   const [error, setError] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
 
   const formattedSize = useMemo(() => {
     if (!file) {
@@ -72,6 +106,81 @@ export default function Home() {
       }
     };
   }, [sourceUrl, resultUrl]);
+
+  useEffect(() => {
+    async function loadUser() {
+      const response = await fetch("/api/auth/me");
+      const data = (await response.json().catch(() => null)) as {
+        user?: User | null;
+      } | null;
+
+      setUser(data?.user ?? null);
+      setIsAuthLoading(false);
+    }
+
+    loadUser();
+  }, []);
+
+  async function handleGoogleCredential(credential?: string) {
+    if (!credential) {
+      setError("Google sign-in did not return a credential.");
+      return;
+    }
+
+    setError("");
+    const response = await fetch("/api/auth/google", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ credential })
+    });
+
+    const data = (await response.json().catch(() => null)) as {
+      user?: User;
+      error?: string;
+    } | null;
+
+    if (!response.ok || !data?.user) {
+      setError(data?.error || "Google sign-in failed. Please try again.");
+      return;
+    }
+
+    setUser(data.user);
+  }
+
+  function renderGoogleButton() {
+    if (
+      !process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
+      !window.google ||
+      !googleButtonRef.current ||
+      user
+    ) {
+      return;
+    }
+
+    googleButtonRef.current.innerHTML = "";
+    window.google.accounts.id.initialize({
+      client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+      callback: (response) => handleGoogleCredential(response.credential)
+    });
+    window.google.accounts.id.renderButton(googleButtonRef.current, {
+      theme: "outline",
+      size: "large",
+      width: 260
+    });
+  }
+
+  async function handleLogout() {
+    await fetch("/api/auth/logout", {
+      method: "POST"
+    });
+
+    setUser(null);
+    resetResult();
+    setError("");
+    window.setTimeout(renderGoogleButton, 0);
+  }
 
   function resetResult() {
     if (resultUrl) {
@@ -116,6 +225,11 @@ export default function Home() {
       return;
     }
 
+    if (!user) {
+      setError("Please sign in with Google before removing backgrounds.");
+      return;
+    }
+
     setError("");
     setIsProcessing(true);
     resetResult();
@@ -151,16 +265,51 @@ export default function Home() {
 
   return (
     <main className="min-h-screen">
+      <Script
+        async
+        defer
+        onLoad={renderGoogleButton}
+        src="https://accounts.google.com/gsi/client"
+      />
       <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-5">
         <a className="text-base font-semibold tracking-[0.08em] text-neutral-950" href="#">
           IMAGE BG REMOVER
         </a>
-        <a
-          className="rounded-md bg-neutral-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-teal-800"
-          href="#tool"
-        >
-          Start
-        </a>
+        <div className="flex items-center gap-3">
+          {isAuthLoading ? (
+            <span className="text-sm text-neutral-600">Checking sign-in...</span>
+          ) : user ? (
+            <>
+              {user.picture ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  alt=""
+                  className="h-8 w-8 rounded-full"
+                  referrerPolicy="no-referrer"
+                  src={user.picture}
+                />
+              ) : null}
+              <span className="hidden max-w-44 truncate text-sm text-neutral-700 sm:inline">
+                {user.email}
+              </span>
+              <button
+                className="rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm font-semibold text-neutral-800 transition hover:border-neutral-500"
+                onClick={handleLogout}
+                type="button"
+              >
+                Sign out
+              </button>
+            </>
+          ) : (
+            <div ref={googleButtonRef} />
+          )}
+          <a
+            className="rounded-md bg-neutral-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-teal-800"
+            href="#tool"
+          >
+            Start
+          </a>
+        </div>
       </header>
 
       <section className="mx-auto grid w-full max-w-6xl gap-8 px-5 pb-12 pt-6 lg:grid-cols-[0.92fr_1.08fr] lg:items-center lg:pt-10">
@@ -181,6 +330,12 @@ export default function Home() {
             <span className="rounded-md bg-white/75 px-3 py-2 shadow-sm">WebP</span>
             <span className="rounded-md bg-white/75 px-3 py-2 shadow-sm">Up to 10MB</span>
           </div>
+          {!user ? (
+            <p className="mt-5 max-w-xl rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-800">
+              Sign in with Google to remove backgrounds. Upload preview is available
+              before signing in.
+            </p>
+          ) : null}
         </div>
 
         <form
@@ -255,7 +410,7 @@ export default function Home() {
           <div className="mt-5 flex flex-col gap-3 sm:flex-row">
             <button
               className="rounded-md bg-teal-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-teal-800 disabled:cursor-not-allowed disabled:bg-neutral-300"
-              disabled={!file || isProcessing}
+              disabled={!file || !user || isProcessing}
               type="submit"
             >
               {isProcessing ? "Removing..." : "Remove Background"}

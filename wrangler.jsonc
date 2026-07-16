@@ -2,5 +2,12 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "image-background-remover",
   "compatibility_date": "2026-07-14",
-  "pages_build_output_dir": "out"
+  "pages_build_output_dir": "out",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "image-background-remover-db",
+      "database_id": "0a2a4852-ee61-4340-ae93-525924f3c14a"
+    }
+  ]
 }

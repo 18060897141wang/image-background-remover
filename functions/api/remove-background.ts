@@ -1,17 +1,17 @@
-export interface Env {
-  REMOVE_BG_API_KEY: string;
-}
+import { Env, getCurrentUser, jsonError } from "../_lib/auth";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const SUPPORTED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
-function jsonError(message: string, status = 400) {
-  return Response.json({ error: message }, { status });
-}
-
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   if (!env.REMOVE_BG_API_KEY) {
     return jsonError("Remove.bg API key is not configured.", 500);
+  }
+
+  const user = await getCurrentUser(request, env);
+
+  if (!user) {
+    return jsonError("Please sign in with Google before removing backgrounds.", 401);
   }
 
   let formData: FormData;

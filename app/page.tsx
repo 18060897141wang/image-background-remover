@@ -1,6 +1,7 @@
 "use client";
 
 import Script from "next/script";
+import Link from "next/link";
 import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -272,9 +273,9 @@ export default function Home() {
         src="https://accounts.google.com/gsi/client"
       />
       <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-5">
-        <a className="text-base font-semibold tracking-[0.08em] text-neutral-950" href="#">
+        <Link className="text-base font-semibold tracking-[0.08em] text-neutral-950" href="/">
           IMAGE BG REMOVER
-        </a>
+        </Link>
         <div className="flex items-center gap-3">
           {isAuthLoading ? (
             <span className="text-sm text-neutral-600">Checking sign-in...</span>
@@ -303,6 +304,12 @@ export default function Home() {
           ) : (
             <div ref={googleButtonRef} />
           )}
+          <Link
+            className="hidden text-sm font-semibold text-neutral-700 transition hover:text-neutral-950 sm:inline"
+            href="/pricing"
+          >
+            Pricing
+          </Link>
           <a
             className="rounded-md bg-neutral-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-teal-800"
             href="#tool"

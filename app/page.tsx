@@ -80,6 +80,7 @@ function validateFile(file: File) {
 export default function Home() {
   const inputRef = useRef<HTMLInputElement>(null);
   const googleButtonRef = useRef<HTMLDivElement>(null);
+  const [googleClientId, setGoogleClientId] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [sourceUrl, setSourceUrl] = useState("");
   const [resultUrl, setResultUrl] = useState("");
@@ -111,19 +112,30 @@ export default function Home() {
 
   useEffect(() => {
     async function loadUser() {
-      const response = await fetch("/api/auth/me");
-      const data = (await response.json().catch(() => null)) as {
+      const [meResponse, configResponse] = await Promise.all([
+        fetch("/api/auth/me"),
+        fetch("/api/config")
+      ]);
+      const data = (await meResponse.json().catch(() => null)) as {
         user?: User | null;
         credits?: number;
+      } | null;
+      const config = (await configResponse.json().catch(() => null)) as {
+        googleClientId?: string;
       } | null;
 
       setUser(data?.user ?? null);
       setCredits(data?.credits ?? 0);
+      setGoogleClientId(config?.googleClientId ?? "");
       setIsAuthLoading(false);
     }
 
     loadUser();
   }, []);
+
+  useEffect(() => {
+    renderGoogleButton();
+  }, [googleClientId, user]);
 
   async function handleGoogleCredential(credential?: string) {
     if (!credential) {
@@ -157,7 +169,7 @@ export default function Home() {
 
   function renderGoogleButton() {
     if (
-      !process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
+      !googleClientId ||
       !window.google ||
       !googleButtonRef.current ||
       user
@@ -167,7 +179,7 @@ export default function Home() {
 
     googleButtonRef.current.innerHTML = "";
     window.google.accounts.id.initialize({
-      client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+      client_id: googleClientId,
       callback: (response) => handleGoogleCredential(response.credential)
     });
     window.google.accounts.id.renderButton(googleButtonRef.current, {

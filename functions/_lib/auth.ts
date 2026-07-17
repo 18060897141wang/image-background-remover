@@ -6,6 +6,7 @@ export interface Env {
   PAYPAL_CLIENT_ID: string;
   PAYPAL_CLIENT_SECRET: string;
   PAYPAL_ENV?: string;
+  PAYPAL_WEBHOOK_ID?: string;
 }
 
 export interface AuthUser {

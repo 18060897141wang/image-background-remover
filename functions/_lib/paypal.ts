@@ -1,4 +1,5 @@
 import { Env, jsonError } from "./auth";
+import { creditExpiry, getAvailableCredits, grantCredits } from "./credits";
 
 export function paypalBaseUrl(env: Env) {
   return env.PAYPAL_ENV === "live"
@@ -36,4 +37,69 @@ export async function getPayPalAccessToken(env: Env) {
 
 export function paypalError(error: unknown) {
   return jsonError(error instanceof Error ? error.message : "PayPal request failed.", 500);
+}
+
+export async function captureStoredOrder(env: Env, orderId: string) {
+  const localOrder = await env.DB.prepare("SELECT * FROM paypal_orders WHERE id = ?")
+    .bind(orderId)
+    .first<{
+      id: string;
+      user_id: string;
+      status: string;
+      credits: number;
+      plan_id: string;
+    }>();
+
+  if (!localOrder) {
+    throw new Error("Order not found.");
+  }
+
+  if (localOrder.status === "COMPLETED") {
+    const credits = await getAvailableCredits(env, localOrder.user_id);
+    return { ok: true, credits, alreadyCaptured: true };
+  }
+
+  const accessToken = await getPayPalAccessToken(env);
+  const response = await fetch(
+    `${paypalBaseUrl(env)}/v2/checkout/orders/${encodeURIComponent(orderId)}/capture`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json"
+      }
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to capture PayPal order.");
+  }
+
+  const order = (await response.json()) as { status: string };
+
+  if (order.status !== "COMPLETED") {
+    await env.DB.prepare("UPDATE paypal_orders SET status = ?, updated_at = ? WHERE id = ?")
+      .bind(order.status, new Date().toISOString(), orderId)
+      .run();
+    throw new Error("PayPal order was not completed.");
+  }
+
+  const now = new Date().toISOString();
+  await grantCredits(
+    env,
+    localOrder.user_id,
+    Number(localOrder.credits),
+    `paypal_${localOrder.plan_id}`,
+    orderId,
+    creditExpiry(30)
+  );
+  await env.DB.prepare(
+    "UPDATE paypal_orders SET status = ?, captured_at = ?, updated_at = ? WHERE id = ?"
+  )
+    .bind("COMPLETED", now, now, orderId)
+    .run();
+
+  const credits = await getAvailableCredits(env, localOrder.user_id);
+
+  return { ok: true, credits };
 }

@@ -86,6 +86,7 @@ export default function Home() {
   const [error, setError] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [credits, setCredits] = useState(0);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
 
   const formattedSize = useMemo(() => {
@@ -113,9 +114,11 @@ export default function Home() {
       const response = await fetch("/api/auth/me");
       const data = (await response.json().catch(() => null)) as {
         user?: User | null;
+        credits?: number;
       } | null;
 
       setUser(data?.user ?? null);
+      setCredits(data?.credits ?? 0);
       setIsAuthLoading(false);
     }
 
@@ -139,6 +142,7 @@ export default function Home() {
 
     const data = (await response.json().catch(() => null)) as {
       user?: User;
+      credits?: number;
       error?: string;
     } | null;
 
@@ -148,6 +152,7 @@ export default function Home() {
     }
 
     setUser(data.user);
+    setCredits(data.credits ?? 0);
   }
 
   function renderGoogleButton() {
@@ -178,6 +183,7 @@ export default function Home() {
     });
 
     setUser(null);
+    setCredits(0);
     resetResult();
     setError("");
     window.setTimeout(renderGoogleButton, 0);
@@ -253,6 +259,7 @@ export default function Home() {
 
       const blob = await response.blob();
       setResultUrl(URL.createObjectURL(blob));
+      setCredits((currentCredits) => Math.max(0, currentCredits - 1));
     } catch (caughtError) {
       setError(
         caughtError instanceof Error
@@ -292,6 +299,9 @@ export default function Home() {
               ) : null}
               <span className="hidden max-w-44 truncate text-sm text-neutral-700 sm:inline">
                 {user.email}
+              </span>
+              <span className="rounded-md bg-teal-50 px-3 py-2 text-sm font-semibold text-teal-800">
+                {credits} credits
               </span>
               <button
                 className="rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm font-semibold text-neutral-800 transition hover:border-neutral-500"

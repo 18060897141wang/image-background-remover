@@ -1,3 +1,4 @@
+import { deductCredit, getAvailableCredits } from "../_lib/credits";
 import { Env, getCurrentUser, jsonError } from "../_lib/auth";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -12,6 +13,12 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
   if (!user) {
     return jsonError("Please sign in with Google before removing backgrounds.", 401);
+  }
+
+  const credits = await getAvailableCredits(env, user.id);
+
+  if (credits < 1) {
+    return jsonError("You do not have enough credits. Please buy more credits.", 402);
   }
 
   let formData: FormData;
@@ -67,6 +74,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
     return jsonError(detail, response.status);
   }
+
+  await deductCredit(env, user.id);
 
   return new Response(response.body, {
     status: 200,

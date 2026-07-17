@@ -6,6 +6,7 @@ import {
   sessionCookie,
   sessionExpiry
 } from "../../_lib/auth";
+import { getAvailableCredits, grantCredits } from "../../_lib/credits";
 
 interface GoogleTokenInfo {
   aud: string;
@@ -62,6 +63,9 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
   const now = new Date().toISOString();
   const userId = `google:${tokenInfo.sub}`;
+  const existingUser = await env.DB.prepare("SELECT id FROM users WHERE google_sub = ?")
+    .bind(tokenInfo.sub)
+    .first<{ id: string }>();
 
   await env.DB.prepare(
     `INSERT INTO users (id, google_sub, email, name, picture, created_at, updated_at, last_login_at)
@@ -85,6 +89,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     )
     .run();
 
+  if (!existingUser) {
+    await grantCredits(env, userId, 3, "free_signup", null, null);
+  }
+
   const sessionId = createSessionId();
   const idHash = await hashSessionId(sessionId, env.SESSION_SECRET);
   const expiresAt = sessionExpiry();
@@ -95,6 +103,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     .bind(idHash, userId, now, expiresAt.toISOString())
     .run();
 
+  const credits = await getAvailableCredits(env, userId);
+
   return Response.json(
     {
       user: {
@@ -102,7 +112,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
         email: tokenInfo.email,
         name: tokenInfo.name ?? null,
         picture: tokenInfo.picture ?? null
-      }
+      },
+      credits
     },
     {
       headers: {

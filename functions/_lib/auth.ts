@@ -3,6 +3,9 @@ export interface Env {
   GOOGLE_CLIENT_ID: string;
   SESSION_SECRET: string;
   REMOVE_BG_API_KEY: string;
+  PAYPAL_CLIENT_ID: string;
+  PAYPAL_CLIENT_SECRET: string;
+  PAYPAL_ENV?: string;
 }
 
 export interface AuthUser {
@@ -111,4 +114,8 @@ export async function deleteCurrentSession(request: Request, env: Env) {
 
 export function jsonError(message: string, status = 400) {
   return Response.json({ error: message }, { status });
+}
+
+export function createId(prefix: string) {
+  return `${prefix}_${createSessionId().slice(0, 24)}`;
 }

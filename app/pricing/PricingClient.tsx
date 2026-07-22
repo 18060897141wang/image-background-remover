@@ -8,7 +8,7 @@ const plans = [
     id: "free",
     name: "Free",
     price: "$0",
-    period: "forever",
+    period: "starter credits",
     credits: "3 credits",
     unitPrice: "Try before upgrading",
     description: "For first-time users who want to test background removal.",
@@ -17,6 +17,7 @@ const plans = [
     features: [
       "3 free image removals",
       "Google sign-in required",
+      "Free starter credits do not expire",
       "Transparent PNG download",
       "JPG, PNG, and WebP support",
       "Images up to 10MB"
@@ -34,7 +35,9 @@ const plans = [
     featured: true,
     features: [
       "30 image removals",
-      "Credits valid for 30 days",
+      "Credits valid for 90 days",
+      "One-time purchase",
+      "No subscription or automatic renewal",
       "Transparent PNG download",
       "Commercial use",
       "Good for product and social media images"
@@ -52,7 +55,9 @@ const plans = [
     featured: false,
     features: [
       "120 image removals",
-      "Credits valid for 30 days",
+      "Credits valid for 90 days",
+      "One-time purchase",
+      "No subscription or automatic renewal",
       "Transparent PNG download",
       "Commercial use",
       "Best value for frequent usage"
@@ -64,7 +69,7 @@ const faqs = [
   {
     question: "Is this a subscription?",
     answer:
-      "No. Creator and Pro are one-time purchases of monthly credits. Credits are valid for 30 days."
+      "No. Creator and Pro are one-time credit packs. There is no subscription and no automatic renewal. Paid credits are valid for 90 days."
   },
   {
     question: "How does a credit work?",
@@ -74,7 +79,7 @@ const faqs = [
   {
     question: "Do credits roll over?",
     answer:
-      "Credits from a one-time purchase are valid for 30 days. The MVP does not support rollover after expiration."
+      "Paid credits are valid for 90 days after purchase. Free starter credits are separate and do not expire."
   },
   {
     question: "Why do you limit image removals?",
@@ -138,6 +143,12 @@ export default function PricingClient() {
             Tool
           </Link>
           <Link
+            className="text-neutral-700 transition hover:text-neutral-950"
+            href="/blog"
+          >
+            Blog
+          </Link>
+          <Link
             className="rounded-md bg-neutral-950 px-4 py-2 text-white transition hover:bg-teal-800"
             href="/pricing"
           >
@@ -148,14 +159,14 @@ export default function PricingClient() {
 
       <section className="mx-auto max-w-6xl px-5 pb-10 pt-8 text-center">
         <p className="mb-4 inline-flex rounded-full border border-teal-700/30 bg-white/70 px-3 py-1 text-sm font-medium text-teal-800">
-          One-time monthly credits
+          One-time credit packs
         </p>
         <h1 className="mx-auto max-w-4xl text-5xl font-semibold leading-[1.04] text-neutral-950 sm:text-6xl">
-          Buy the credits you need this month
+          Buy credits when you need them
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-neutral-700">
           Start with free credits, then buy Creator or Pro credits through PayPal.
-          Paid credits are valid for 30 days.
+          Paid credits are valid for 90 days. No subscription, no automatic renewal.
         </p>
         {error ? (
           <p className="mx-auto mt-5 max-w-2xl rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -245,9 +256,9 @@ export default function PricingClient() {
             </p>
           </div>
           <div className="rounded-md border border-neutral-200 bg-white p-5">
-            <h3 className="font-semibold text-neutral-950">30-day validity</h3>
+            <h3 className="font-semibold text-neutral-950">90-day validity</h3>
             <p className="mt-2 text-sm leading-6 text-neutral-600">
-              Creator and Pro credits expire 30 days after purchase.
+              Creator and Pro credits expire 90 days after purchase.
             </p>
           </div>
         </div>
@@ -266,7 +277,18 @@ export default function PricingClient() {
       </section>
 
       <footer className="px-5 pb-8 text-center text-sm text-neutral-600">
-        Need more than 120 images this month? Contact us for a custom volume plan.
+        <p>Need more than 120 images? Contact us for a custom volume plan.</p>
+        <div className="mt-3 flex justify-center gap-4">
+          <Link className="font-medium text-neutral-700 hover:text-neutral-950" href="/blog">
+            Blog
+          </Link>
+          <Link className="font-medium text-neutral-700 hover:text-neutral-950" href="/privacy">
+            Privacy Policy
+          </Link>
+          <Link className="font-medium text-neutral-700 hover:text-neutral-950" href="/terms">
+            Terms of Service
+          </Link>
+        </div>
       </footer>
     </main>
   );

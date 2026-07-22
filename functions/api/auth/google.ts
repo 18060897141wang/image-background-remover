@@ -6,7 +6,7 @@ import {
   sessionCookie,
   sessionExpiry
 } from "../../_lib/auth";
-import { getAvailableCredits, grantCredits } from "../../_lib/credits";
+import { FREE_SIGNUP_CREDITS, getAvailableCredits, grantCredits } from "../../_lib/credits";
 
 interface GoogleTokenInfo {
   aud: string;
@@ -90,7 +90,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     .run();
 
   if (!existingUser) {
-    await grantCredits(env, userId, 3, "free_signup", null, null);
+    await grantCredits(env, userId, FREE_SIGNUP_CREDITS, "free_signup", null, null);
   }
 
   const sessionId = createSessionId();

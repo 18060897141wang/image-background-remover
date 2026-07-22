@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Transparent PNG guide illustration</title>
+  <desc id="desc">A checkerboard transparent canvas with a clean image cutout and PNG label.</desc>
+  <rect width="1200" height="675" fill="#f8fafc"/>
+  <rect x="116" y="94" width="968" height="487" rx="30" fill="#fff" stroke="#d6d3d1" stroke-width="3"/>
+  <defs>
+    <pattern id="checkers" width="72" height="72" patternUnits="userSpaceOnUse">
+      <rect width="36" height="36" fill="#e5e7eb"/>
+      <rect x="36" y="36" width="36" height="36" fill="#e5e7eb"/>
+      <rect x="36" width="36" height="36" fill="#f9fafb"/>
+      <rect y="36" width="36" height="36" fill="#f9fafb"/>
+    </pattern>
+  </defs>
+  <rect x="174" y="152" width="434" height="371" rx="22" fill="url(#checkers)" stroke="#cbd5e1" stroke-width="2"/>
+  <rect x="668" y="152" width="332" height="371" rx="22" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <path d="M335 267c-48 0-86 41-86 92 0 78 53 116 111 116s106-39 106-116c0-51-37-92-86-92z" fill="#14b8a6"/>
+  <path d="M335 236c27-38 71-43 102-10 24 25 34 60 13 89-40-18-84-18-129 0-17-26-11-55 14-79z" fill="#0f766e"/>
+  <path d="M727 260h214v48H727zm0 86h214v48H727zm0 86h145v48H727z" fill="#d1fae5"/>
+  <rect x="753" y="206" width="162" height="42" rx="21" fill="#0f766e"/>
+  <text x="786" y="235" fill="#ffffff" font-family="Arial, sans-serif" font-size="25" font-weight="700">PNG</text>
+  <text x="206" y="623" fill="#334155" font-family="Arial, sans-serif" font-size="30" font-weight="700">Transparent canvas</text>
+  <text x="720" y="623" fill="#334155" font-family="Arial, sans-serif" font-size="30" font-weight="700">Reusable file</text>
+</svg>

@@ -1,6 +1,7 @@
 node_modules
 .next
 .open-next
+.wrangler
 out
 .env
 .env*
@@ -8,6 +9,7 @@ out
 .dev.vars
 dev-server*.log
 *.local
+*.tsbuildinfo
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

@@ -1,5 +1,5 @@
 import { Env, jsonError } from "./auth";
-import { creditExpiry, getAvailableCredits, grantCredits } from "./credits";
+import { getAvailableCredits, grantPayPalCreditsOnce, paidCreditExpiry } from "./credits";
 
 export function paypalBaseUrl(env: Env) {
   return env.PAYPAL_ENV === "live"
@@ -59,6 +59,23 @@ export async function captureStoredOrder(env: Env, orderId: string) {
     return { ok: true, credits, alreadyCaptured: true };
   }
 
+  if (localOrder.status === "CAPTURING") {
+    throw new Error("Payment is already being confirmed. Please refresh shortly.");
+  }
+
+  const captureStarted = await env.DB.prepare(
+    `UPDATE paypal_orders
+     SET status = ?, updated_at = ?
+     WHERE id = ? AND status NOT IN ('COMPLETED', 'CAPTURING')`
+  )
+    .bind("CAPTURING", new Date().toISOString(), orderId)
+    .run();
+
+  if (Number(captureStarted.meta?.changes ?? 0) !== 1) {
+    const credits = await getAvailableCredits(env, localOrder.user_id);
+    return { ok: true, credits, alreadyCaptured: true };
+  }
+
   const accessToken = await getPayPalAccessToken(env);
   const response = await fetch(
     `${paypalBaseUrl(env)}/v2/checkout/orders/${encodeURIComponent(orderId)}/capture`,
@@ -72,6 +89,9 @@ export async function captureStoredOrder(env: Env, orderId: string) {
   );
 
   if (!response.ok) {
+    await env.DB.prepare("UPDATE paypal_orders SET status = ?, updated_at = ? WHERE id = ?")
+      .bind("CAPTURE_FAILED", new Date().toISOString(), orderId)
+      .run();
     throw new Error("Failed to capture PayPal order.");
   }
 
@@ -85,13 +105,13 @@ export async function captureStoredOrder(env: Env, orderId: string) {
   }
 
   const now = new Date().toISOString();
-  await grantCredits(
+  await grantPayPalCreditsOnce(
     env,
     localOrder.user_id,
     Number(localOrder.credits),
     `paypal_${localOrder.plan_id}`,
     orderId,
-    creditExpiry(30)
+    paidCreditExpiry(env)
   );
   await env.DB.prepare(
     "UPDATE paypal_orders SET status = ?, captured_at = ?, updated_at = ? WHERE id = ?"

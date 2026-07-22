@@ -86,6 +86,7 @@ export default function Home() {
   const [resultUrl, setResultUrl] = useState("");
   const [error, setError] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [requestId, setRequestId] = useState("");
   const [user, setUser] = useState<User | null>(null);
   const [credits, setCredits] = useState(0);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
@@ -226,6 +227,7 @@ export default function Home() {
     }
 
     setFile(nextFile);
+    setRequestId(crypto.randomUUID());
     setSourceUrl(URL.createObjectURL(nextFile));
   }
 
@@ -253,12 +255,17 @@ export default function Home() {
     setIsProcessing(true);
     resetResult();
 
+    const effectiveRequestId = requestId || crypto.randomUUID();
     const formData = new FormData();
     formData.append("image", file);
+    formData.append("idempotencyKey", effectiveRequestId);
 
     try {
       const response = await fetch("/api/remove-background", {
         method: "POST",
+        headers: {
+          "Idempotency-Key": effectiveRequestId
+        },
         body: formData
       });
 
@@ -278,6 +285,10 @@ export default function Home() {
           ? caughtError.message
           : "Background removal failed. Please try again."
       );
+      const data = (await fetch("/api/auth/me")
+        .then((response) => response.json())
+        .catch(() => null)) as { credits?: number } | null;
+      setCredits(data?.credits ?? credits);
     } finally {
       setIsProcessing(false);
     }
@@ -331,6 +342,12 @@ export default function Home() {
             href="/pricing"
           >
             Pricing
+          </Link>
+          <Link
+            className="hidden text-sm font-semibold text-neutral-700 transition hover:text-neutral-950 sm:inline"
+            href="/blog"
+          >
+            Blog
           </Link>
           <a
             className="rounded-md bg-neutral-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-teal-800"
@@ -514,7 +531,18 @@ export default function Home() {
       </section>
 
       <footer className="px-5 py-8 text-center text-sm text-neutral-600">
-        Uploaded images are processed in memory and are not stored on our servers.
+        <p>Uploaded images are processed in memory and are not stored on our servers.</p>
+        <div className="mt-3 flex justify-center gap-4">
+          <Link className="font-medium text-neutral-700 hover:text-neutral-950" href="/blog">
+            Blog
+          </Link>
+          <Link className="font-medium text-neutral-700 hover:text-neutral-950" href="/privacy">
+            Privacy Policy
+          </Link>
+          <Link className="font-medium text-neutral-700 hover:text-neutral-950" href="/terms">
+            Terms of Service
+          </Link>
+        </div>
       </footer>
     </main>
   );

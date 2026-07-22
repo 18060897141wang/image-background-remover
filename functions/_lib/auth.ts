@@ -7,6 +7,8 @@ export interface Env {
   PAYPAL_CLIENT_SECRET: string;
   PAYPAL_ENV?: string;
   PAYPAL_WEBHOOK_ID?: string;
+  PAID_CREDIT_VALIDITY_DAYS?: string;
+  REMOVE_BG_LOW_BALANCE_THRESHOLD?: string;
 }
 
 export interface AuthUser {

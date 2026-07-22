@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Product photo guide illustration</title>
+  <desc id="desc">Clean product photo cards for an ecommerce store layout.</desc>
+  <rect width="1200" height="675" fill="#f6f7f4"/>
+  <rect x="94" y="82" width="1012" height="512" rx="32" fill="#ffffff" stroke="#d8dedb" stroke-width="3"/>
+  <rect x="154" y="151" width="258" height="332" rx="24" fill="#f8fafc" stroke="#d1d5db" stroke-width="2"/>
+  <rect x="471" y="151" width="258" height="332" rx="24" fill="#f8fafc" stroke="#d1d5db" stroke-width="2"/>
+  <rect x="788" y="151" width="258" height="332" rx="24" fill="#f8fafc" stroke="#d1d5db" stroke-width="2"/>
+  <path d="M239 284h88l34 115H205z" fill="#0f766e"/>
+  <path d="M238 252h90l-12 32h-66z" fill="#14b8a6"/>
+  <circle cx="600" cy="321" r="78" fill="#0f766e"/>
+  <rect x="552" y="243" width="96" height="58" rx="18" fill="#5eead4"/>
+  <path d="M862 386h110l-18-146h-74z" fill="#0f766e"/>
+  <path d="M883 240c2-39 66-39 68 0" fill="none" stroke="#14b8a6" stroke-width="18" stroke-linecap="round"/>
+  <rect x="197" y="515" width="174" height="18" rx="9" fill="#cbd5e1"/>
+  <rect x="515" y="515" width="174" height="18" rx="9" fill="#cbd5e1"/>
+  <rect x="832" y="515" width="174" height="18" rx="9" fill="#cbd5e1"/>
+  <text x="378" y="635" fill="#334155" font-family="Arial, sans-serif" font-size="32" font-weight="700">Clean ecommerce product images</text>
+</svg>

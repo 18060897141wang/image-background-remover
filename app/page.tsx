@@ -473,6 +473,19 @@ export default function Home() {
               Download PNG
             </a>
           </div>
+          <p className="mt-4 text-xs leading-5 text-neutral-500">
+            By uploading an image, you agree to our{" "}
+            <Link className="font-medium text-neutral-700 underline-offset-2 hover:underline" href="/terms">
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link className="font-medium text-neutral-700 underline-offset-2 hover:underline" href="/acceptable-use-policy">
+              Acceptable Use Policy
+            </Link>
+            . You confirm that the image does not contain pornography, sexually
+            explicit material, sexually suggestive material, NSFW content, or illegal
+            content.
+          </p>
         </form>
       </section>
 
@@ -532,7 +545,7 @@ export default function Home() {
 
       <footer className="px-5 py-8 text-center text-sm text-neutral-600">
         <p>Uploaded images are processed in memory and are not stored on our servers.</p>
-        <div className="mt-3 flex justify-center gap-4">
+        <div className="mt-3 flex flex-wrap justify-center gap-4">
           <Link className="font-medium text-neutral-700 hover:text-neutral-950" href="/blog">
             Blog
           </Link>
@@ -541,6 +554,15 @@ export default function Home() {
           </Link>
           <Link className="font-medium text-neutral-700 hover:text-neutral-950" href="/terms">
             Terms of Service
+          </Link>
+          <Link className="font-medium text-neutral-700 hover:text-neutral-950" href="/acceptable-use-policy">
+            Acceptable Use Policy
+          </Link>
+          <Link className="font-medium text-neutral-700 hover:text-neutral-950" href="/refund-policy">
+            Refund Policy
+          </Link>
+          <Link className="font-medium text-neutral-700 hover:text-neutral-950" href="/contact">
+            Contact
           </Link>
         </div>
       </footer>

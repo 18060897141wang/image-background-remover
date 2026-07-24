@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Terms of Service - Image Background Remover",
+  title: "Terms of Service | Remove.Services",
   description:
-    "Terms of Service for Image Background Remover, including accounts, credits, payments, acceptable use, and third-party services."
+    "Terms governing the lawful use of Remove.Services, including prohibited content, accounts, credits, payments, and user responsibilities."
 };
 
 const sections = [
@@ -12,7 +12,8 @@ const sections = [
     title: "Use of the Service",
     body: [
       "Image Background Remover lets users upload images, remove backgrounds, and download processed results.",
-      "You must use the service only for lawful purposes and in a way that does not abuse, overload, disrupt, or attempt to compromise the website or its providers."
+      "You must use the service only for lawful purposes and in a way that does not abuse, overload, disrupt, or attempt to compromise the website or its providers.",
+      "Your use of the service is also governed by our Acceptable Use Policy."
     ]
   },
   {
@@ -42,6 +43,14 @@ const sections = [
     body: [
       "You keep ownership of images you upload. You give us the limited permission needed to process those images and return the background-removed result.",
       "You confirm that you have the rights needed to upload and process each image, and that the image does not violate laws, privacy rights, intellectual property rights, or third-party platform rules."
+    ]
+  },
+  {
+    title: "Prohibited Content",
+    body: [
+      "You may not upload, process, edit, remove backgrounds from, store, or distribute images that contain pornography, nudity, sexually explicit material, sexually suggestive material, or other NSFW content.",
+      "You may not use the service for content that depicts, exploits, abuses, or sexualizes minors; non-consensual intimate imagery; sexual exploitation; trafficking; violence; terrorism; illegal activity; fraud; harassment; hate; abuse; malware; or content that infringes third-party rights.",
+      "We may refuse processing, restrict access, suspend or terminate accounts, reverse credits, and take other reasonable action when prohibited content or abusive activity is detected."
     ]
   },
   {
@@ -98,6 +107,15 @@ export default function TermsOfServicePage() {
             <Link className="hover:text-neutral-950" href="/privacy">
               Privacy
             </Link>
+            <Link className="hover:text-neutral-950" href="/acceptable-use-policy">
+              Acceptable Use
+            </Link>
+            <Link className="hover:text-neutral-950" href="/refund-policy">
+              Refund
+            </Link>
+            <Link className="hover:text-neutral-950" href="/contact">
+              Contact
+            </Link>
           </nav>
         </div>
       </header>
@@ -111,6 +129,13 @@ export default function TermsOfServicePage() {
           These Terms of Service govern your access to and use of Image Background Remover,
           available at remove.services. By using the website, signing in, uploading an image,
           or purchasing credits, you agree to these Terms.
+        </p>
+        <p className="mt-4 max-w-3xl text-base leading-7 text-neutral-700">
+          By uploading an image, you also agree to the{" "}
+          <Link className="font-medium text-blue-700 hover:text-blue-900" href="/acceptable-use-policy">
+            Acceptable Use Policy
+          </Link>
+          .
         </p>
 
         <div className="mt-10 space-y-8">

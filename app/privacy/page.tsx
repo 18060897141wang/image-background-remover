@@ -88,6 +88,12 @@ export default function PrivacyPolicyPage() {
             <Link className="hover:text-neutral-950" href="/terms">
               Terms
             </Link>
+            <Link className="hover:text-neutral-950" href="/refund-policy">
+              Refund
+            </Link>
+            <Link className="hover:text-neutral-950" href="/contact">
+              Contact
+            </Link>
           </nav>
         </div>
       </header>

@@ -278,7 +278,7 @@ export default function PricingClient() {
 
       <footer className="px-5 pb-8 text-center text-sm text-neutral-600">
         <p>Need more than 120 images? Contact us for a custom volume plan.</p>
-        <div className="mt-3 flex justify-center gap-4">
+        <div className="mt-3 flex flex-wrap justify-center gap-4">
           <Link className="font-medium text-neutral-700 hover:text-neutral-950" href="/blog">
             Blog
           </Link>
@@ -287,6 +287,15 @@ export default function PricingClient() {
           </Link>
           <Link className="font-medium text-neutral-700 hover:text-neutral-950" href="/terms">
             Terms of Service
+          </Link>
+          <Link className="font-medium text-neutral-700 hover:text-neutral-950" href="/acceptable-use-policy">
+            Acceptable Use Policy
+          </Link>
+          <Link className="font-medium text-neutral-700 hover:text-neutral-950" href="/refund-policy">
+            Refund Policy
+          </Link>
+          <Link className="font-medium text-neutral-700 hover:text-neutral-950" href="/contact">
+            Contact
           </Link>
         </div>
       </footer>

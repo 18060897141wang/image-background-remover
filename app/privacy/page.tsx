@@ -33,14 +33,14 @@ const sections = [
   {
     title: "Third-Party Services",
     body: [
-      "We use Google Sign-In for authentication, PayPal for payments, remove.bg for background removal, and Cloudflare for hosting, security, and delivery.",
+      "We use Google Sign-In for authentication, third-party payment providers including PayPal and Creem for payments, remove.bg for background removal, and Cloudflare for hosting, security, and delivery.",
       "These providers may process information according to their own privacy policies and service terms."
     ]
   },
   {
     title: "Payments",
     body: [
-      "Payments are handled by PayPal. We do not store your full card number, bank account details, or PayPal password.",
+      "Payments may be handled by third-party payment providers, including PayPal, Creem, or other supported payment processors. We do not store your full card number, bank account details, PayPal password, or equivalent payment account credentials.",
       "We store payment status, order identifiers, credit transactions, and related records so we can grant credits and resolve support issues."
     ]
   },

@@ -34,7 +34,7 @@ const sections = [
   {
     title: "Payments and Refunds",
     body: [
-      "Payments are processed by PayPal. Paid credits are added after successful payment confirmation.",
+      "Payments may be processed by third-party payment providers, including PayPal, Creem, or other supported payment processors. Paid credits are added after successful payment confirmation.",
       "Unless required by law, purchases are final once credits are delivered. If a technical issue prevents credit delivery, we will make reasonable efforts to fix the issue or restore the correct credit balance."
     ]
   },
@@ -56,7 +56,7 @@ const sections = [
   {
     title: "Third-Party Services",
     body: [
-      "The service depends on third-party providers including Google, PayPal, remove.bg, and Cloudflare.",
+      "The service depends on third-party providers including Google, PayPal, Creem, remove.bg, and Cloudflare.",
       "Availability, processing quality, login, payments, and delivery may be affected by those providers. Their own terms and policies may also apply."
     ]
   },

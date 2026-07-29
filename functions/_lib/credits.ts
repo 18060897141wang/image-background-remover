@@ -154,3 +154,28 @@ export async function grantPayPalCreditsOnce(
     )
     .run();
 }
+
+export async function grantCreemCreditsOnce(
+  env: Env,
+  userId: string,
+  amount: number,
+  reason: string,
+  creemCheckoutId: string,
+  expiresAt: Date
+) {
+  await env.DB.prepare(
+    `INSERT OR IGNORE INTO credit_transactions
+      (id, user_id, amount, reason, paypal_order_id, expires_at, created_at, creem_checkout_id)
+     VALUES (?, ?, ?, ?, NULL, ?, ?, ?)`
+  )
+    .bind(
+      createId("credit"),
+      userId,
+      amount,
+      reason,
+      expiresAt.toISOString(),
+      new Date().toISOString(),
+      creemCheckoutId
+    )
+    .run();
+}

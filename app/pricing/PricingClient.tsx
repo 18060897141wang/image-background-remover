@@ -92,42 +92,103 @@ export default function PricingClient() {
   const [loadingPlan, setLoadingPlan] = useState("");
   const [error, setError] = useState("");
 
-  async function buyPlan(planId: string) {
+  async function buyPlan(planId: string, provider: "paypal" | "creem" = "paypal") {
     if (planId === "free") {
       window.location.href = "/";
       return;
     }
 
     setError("");
-    setLoadingPlan(planId);
+    setLoadingPlan(`${provider}:${planId}`);
 
     try {
-      const response = await fetch("/api/paypal/create-order", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ planId })
-      });
+      const response = await fetch(
+        provider === "creem" ? "/api/creem/create-checkout" : "/api/paypal/create-order",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ planId })
+        }
+      );
       const data = (await response.json().catch(() => null)) as {
         approvalUrl?: string;
+        checkoutUrl?: string;
         error?: string;
       } | null;
+      const checkoutUrl = provider === "creem" ? data?.checkoutUrl : data?.approvalUrl;
 
-      if (!response.ok || !data?.approvalUrl) {
-        throw new Error(data?.error || "Could not start PayPal checkout.");
+      if (!response.ok || !checkoutUrl) {
+        throw new Error(
+          data?.error ||
+            `Could not start ${provider === "creem" ? "Creem" : "PayPal"} checkout.`
+        );
       }
 
-      window.location.href = data.approvalUrl;
+      window.location.href = checkoutUrl;
     } catch (caughtError) {
       setError(
         caughtError instanceof Error
           ? caughtError.message
-          : "Could not start PayPal checkout."
+          : `Could not start ${provider === "creem" ? "Creem" : "PayPal"} checkout.`
       );
       setLoadingPlan("");
     }
   }
+
+  async function buyWithPayPal(planId: string) {
+    await buyPlan(planId, "paypal");
+  }
+
+  async function buyWithCreem(planId: string) {
+    await buyPlan(planId, "creem");
+  }
+
+  function isLoading(planId: string, provider: "paypal" | "creem") {
+    return loadingPlan === `${provider}:${planId}`;
+  }
+
+  function isPlanLoading(planId: string) {
+    return loadingPlan.endsWith(`:${planId}`);
+  }
+
+  function checkoutLabel(planId: string, provider: "paypal" | "creem", fallback: string) {
+    if (!isLoading(planId, provider)) {
+      return fallback;
+    }
+
+    return "Starting checkout...";
+  }
+
+  async function startFree(planId: string) {
+    if (planId === "free") {
+      window.location.href = "/";
+    }
+  }
+
+  async function buyPaidPlan(planId: string) {
+    await buyWithCreem(planId);
+  }
+
+  async function buyFallbackPlan(planId: string) {
+    await buyWithPayPal(planId);
+  }
+
+  async function handlePrimaryClick(planId: string) {
+    if (planId === "free") {
+      await startFree(planId);
+      return;
+    }
+
+    await buyPaidPlan(planId);
+  }
+
+  async function handleSecondaryClick(planId: string) {
+    await buyFallbackPlan(planId);
+  }
+
+  const paidProviderText = "Creem or PayPal";
 
   return (
     <main className="min-h-screen">
@@ -165,7 +226,7 @@ export default function PricingClient() {
           Buy credits when you need them
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-neutral-700">
-          Start with free credits, then buy Creator or Pro credits through PayPal.
+          Start with free credits, then buy Creator or Pro credits through {paidProviderText}.
           Paid credits are valid for 90 days. No subscription, no automatic renewal.
         </p>
         {error ? (
@@ -210,18 +271,33 @@ export default function PricingClient() {
                 <p className="mt-1 text-sm text-neutral-500">{plan.unitPrice}</p>
               </div>
 
-              <button
-                className={`mt-7 rounded-md px-5 py-3 text-center text-sm font-semibold transition disabled:cursor-not-allowed disabled:bg-neutral-300 ${
-                  plan.featured
-                    ? "bg-teal-700 text-white hover:bg-teal-800"
-                    : "bg-neutral-950 text-white hover:bg-neutral-800"
-                }`}
-                disabled={loadingPlan === plan.id}
-                onClick={() => buyPlan(plan.id)}
-                type="button"
-              >
-                {loadingPlan === plan.id ? "Starting checkout..." : plan.cta}
-              </button>
+              <div className="mt-7 grid gap-3">
+                <button
+                  className={`rounded-md px-5 py-3 text-center text-sm font-semibold transition disabled:cursor-not-allowed disabled:bg-neutral-300 ${
+                    plan.featured
+                      ? "bg-teal-700 text-white hover:bg-teal-800"
+                      : "bg-neutral-950 text-white hover:bg-neutral-800"
+                  }`}
+                  disabled={isPlanLoading(plan.id)}
+                  onClick={() => handlePrimaryClick(plan.id)}
+                  type="button"
+                >
+                  {plan.id === "free"
+                    ? plan.cta
+                    : checkoutLabel(plan.id, "creem", "Pay with Creem")}
+                </button>
+
+                {plan.id !== "free" ? (
+                  <button
+                    className="rounded-md border border-neutral-300 bg-white px-5 py-3 text-center text-sm font-semibold text-neutral-800 transition hover:border-neutral-950 disabled:cursor-not-allowed disabled:bg-neutral-100 disabled:text-neutral-400"
+                    disabled={isPlanLoading(plan.id)}
+                    onClick={() => handleSecondaryClick(plan.id)}
+                    type="button"
+                  >
+                    {checkoutLabel(plan.id, "paypal", "Pay with PayPal")}
+                  </button>
+                ) : null}
+              </div>
 
               <div className="my-6 h-px bg-neutral-200" />
 

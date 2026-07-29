@@ -4,12 +4,58 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function CheckoutSuccessPage() {
-  const [message, setMessage] = useState("Confirming your PayPal payment...");
+  const [message, setMessage] = useState("Confirming your payment...");
   const [credits, setCredits] = useState<number | null>(null);
+  const [provider, setProvider] = useState("Payment");
 
   useEffect(() => {
+    async function confirmCreemCheckout(requestId: string) {
+      const response = await fetch("/api/creem/confirm-checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ requestId })
+      });
+      const data = (await response.json().catch(() => null)) as {
+        credits?: number;
+        completed?: boolean;
+        error?: string;
+      } | null;
+
+      if (!response.ok) {
+        setMessage(data?.error || "Could not confirm your Creem payment yet.");
+        return;
+      }
+
+      setCredits(data?.credits ?? null);
+      setMessage(
+        data?.completed
+          ? "Payment confirmed. Your credits are ready."
+          : "Payment completed. Your credits will appear after confirmation."
+      );
+    }
+
     async function captureOrder() {
-      const orderId = new URLSearchParams(window.location.search).get("token");
+      const params = new URLSearchParams(window.location.search);
+      const checkoutProvider = params.get("provider");
+
+      if (checkoutProvider === "creem") {
+        const requestId = params.get("request_id");
+        setProvider("Creem checkout");
+
+        if (!requestId) {
+          setMessage("Missing Creem checkout request ID.");
+          return;
+        }
+
+        setMessage("Payment completed. Checking your credit balance...");
+        await confirmCreemCheckout(requestId);
+        return;
+      }
+
+      setProvider("PayPal checkout");
+      const orderId = params.get("token");
 
       if (!orderId) {
         setMessage("Missing PayPal order ID.");
@@ -43,7 +89,7 @@ export default function CheckoutSuccessPage() {
   return (
     <main className="flex min-h-screen items-center justify-center px-5">
       <section className="w-full max-w-xl rounded-lg border border-neutral-200 bg-white p-8 text-center shadow-xl shadow-neutral-900/10">
-        <p className="text-sm font-semibold text-teal-800">PayPal checkout</p>
+        <p className="text-sm font-semibold text-teal-800">{provider}</p>
         <h1 className="mt-3 text-3xl font-semibold text-neutral-950">
           Payment status
         </h1>

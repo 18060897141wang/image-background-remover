@@ -7,6 +7,12 @@ export interface Env {
   PAYPAL_CLIENT_SECRET: string;
   PAYPAL_ENV?: string;
   PAYPAL_WEBHOOK_ID?: string;
+  CREEM_API_KEY?: string;
+  CREEM_ENV?: string;
+  CREEM_CREATOR_PRODUCT_ID?: string;
+  CREEM_PRO_PRODUCT_ID?: string;
+  CREEM_WEBHOOK_SECRET?: string;
+  SITE_URL?: string;
   PAID_CREDIT_VALIDITY_DAYS?: string;
   REMOVE_BG_LOW_BALANCE_THRESHOLD?: string;
 }

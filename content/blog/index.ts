@@ -1,9 +1,11 @@
+import { bestImageBackgroundRemoverTools } from "./best-image-background-remover-tools";
 import { howToCreateCleanProductPhotos } from "./how-to-create-clean-product-photos";
 import { howToMakeImageBackgroundTransparent } from "./how-to-make-image-background-transparent";
 import { howToRemoveBackgroundFromImage } from "./how-to-remove-background-from-image";
 import type { BlogPost } from "./types";
 
 export const blogPosts: BlogPost[] = [
+  bestImageBackgroundRemoverTools,
   howToRemoveBackgroundFromImage,
   howToMakeImageBackgroundTransparent,
   howToCreateCleanProductPhotos

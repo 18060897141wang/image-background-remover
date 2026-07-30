@@ -59,6 +59,8 @@ declare global {
               width?: number;
             }
           ) => void;
+          prompt?: () => void;
+          disableAutoSelect?: () => void;
         };
       };
     };
@@ -80,6 +82,7 @@ function validateFile(file: File) {
 export default function Home() {
   const inputRef = useRef<HTMLInputElement>(null);
   const googleButtonRef = useRef<HTMLDivElement>(null);
+  const accountMenuRef = useRef<HTMLDivElement>(null);
   const [googleClientId, setGoogleClientId] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [sourceUrl, setSourceUrl] = useState("");
@@ -90,6 +93,7 @@ export default function Home() {
   const [user, setUser] = useState<User | null>(null);
   const [credits, setCredits] = useState(0);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
 
   const formattedSize = useMemo(() => {
     if (!file) {
@@ -138,6 +142,35 @@ export default function Home() {
     renderGoogleButton();
   }, [googleClientId, user]);
 
+  useEffect(() => {
+    if (!isAccountMenuOpen) {
+      return;
+    }
+
+    function handlePointerDown(event: MouseEvent) {
+      if (
+        accountMenuRef.current &&
+        !accountMenuRef.current.contains(event.target as Node)
+      ) {
+        setIsAccountMenuOpen(false);
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsAccountMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isAccountMenuOpen]);
+
   async function handleGoogleCredential(credential?: string) {
     if (!credential) {
       setError("Google sign-in did not return a credential.");
@@ -166,6 +199,7 @@ export default function Home() {
 
     setUser(data.user);
     setCredits(data.credits ?? 0);
+    setIsAccountMenuOpen(false);
   }
 
   function renderGoogleButton() {
@@ -190,16 +224,34 @@ export default function Home() {
     });
   }
 
-  async function handleLogout() {
+  async function clearCurrentSession() {
     await fetch("/api/auth/logout", {
       method: "POST"
     });
 
+    window.google?.accounts.id.disableAutoSelect?.();
     setUser(null);
     setCredits(0);
     resetResult();
     setError("");
+    setIsAccountMenuOpen(false);
+  }
+
+  async function handleLogout() {
+    await clearCurrentSession();
     window.setTimeout(renderGoogleButton, 0);
+  }
+
+  async function handleSwitchAccount() {
+    await clearCurrentSession();
+    window.setTimeout(() => {
+      renderGoogleButton();
+      window.google?.accounts.id.prompt?.();
+    }, 0);
+  }
+
+  function getUserInitial() {
+    return (user?.name || user?.email || "U").trim().charAt(0).toUpperCase();
   }
 
   function resetResult() {
@@ -311,28 +363,70 @@ export default function Home() {
             <span className="text-sm text-neutral-600">Checking sign-in...</span>
           ) : user ? (
             <>
-              {user.picture ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  alt=""
-                  className="h-8 w-8 rounded-full"
-                  referrerPolicy="no-referrer"
-                  src={user.picture}
-                />
-              ) : null}
-              <span className="hidden max-w-44 truncate text-sm text-neutral-700 sm:inline">
-                {user.email}
-              </span>
               <span className="rounded-md bg-teal-50 px-3 py-2 text-sm font-semibold text-teal-800">
                 {credits} credits
               </span>
-              <button
-                className="rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm font-semibold text-neutral-800 transition hover:border-neutral-500"
-                onClick={handleLogout}
-                type="button"
-              >
-                Sign out
-              </button>
+              <div className="relative" ref={accountMenuRef}>
+                <button
+                  aria-expanded={isAccountMenuOpen}
+                  aria-haspopup="menu"
+                  className="flex items-center gap-2 rounded-full border border-neutral-200 bg-white py-1 pl-1 pr-3 text-sm font-semibold text-neutral-800 shadow-sm transition hover:border-neutral-400"
+                  onClick={() => setIsAccountMenuOpen((isOpen) => !isOpen)}
+                  type="button"
+                >
+                  {user.picture ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      alt=""
+                      className="h-8 w-8 rounded-full"
+                      referrerPolicy="no-referrer"
+                      src={user.picture}
+                    />
+                  ) : (
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-neutral-950 text-xs font-bold text-white">
+                      {getUserInitial()}
+                    </span>
+                  )}
+                  <span className="hidden max-w-36 truncate sm:inline">
+                    {user.name || user.email}
+                  </span>
+                  <span className="text-xs text-neutral-500">v</span>
+                </button>
+                {isAccountMenuOpen ? (
+                  <div
+                    className="absolute right-0 z-50 mt-2 w-64 overflow-hidden rounded-md border border-neutral-200 bg-white shadow-lg"
+                    role="menu"
+                  >
+                    <div className="border-b border-neutral-100 px-4 py-3">
+                      <p className="truncate text-sm font-semibold text-neutral-950">
+                        {user.name || "Signed in"}
+                      </p>
+                      <p className="mt-1 truncate text-xs text-neutral-600">
+                        {user.email}
+                      </p>
+                      <p className="mt-2 text-xs font-semibold text-teal-800">
+                        {credits} credits available
+                      </p>
+                    </div>
+                    <button
+                      className="block w-full px-4 py-3 text-left text-sm font-semibold text-neutral-800 transition hover:bg-neutral-50"
+                      onClick={handleSwitchAccount}
+                      role="menuitem"
+                      type="button"
+                    >
+                      Switch account
+                    </button>
+                    <button
+                      className="block w-full px-4 py-3 text-left text-sm font-semibold text-neutral-800 transition hover:bg-neutral-50"
+                      onClick={handleLogout}
+                      role="menuitem"
+                      type="button"
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                ) : null}
+              </div>
             </>
           ) : (
             <div ref={googleButtonRef} />

@@ -194,10 +194,11 @@ export default function PricingClient() {
     <main className="min-h-screen">
       <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-5">
         <Link
-          className="text-base font-semibold tracking-[0.08em] text-neutral-950"
+          className="flex items-center"
           href="/"
         >
-          IMAGE BG REMOVER
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img alt="Remove.Services" className="h-8 w-auto" src="/logo.png" />
         </Link>
         <nav className="flex items-center gap-3 text-sm font-semibold">
           <Link className="text-neutral-700 transition hover:text-neutral-950" href="/">

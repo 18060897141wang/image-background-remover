@@ -10,7 +10,7 @@ export const howToRemoveBackgroundFromImage: BlogPost = {
   author: "Remove.Services Editorial",
   category: "Background Removal",
   tags: ["remove background from image", "online background remover", "transparent image"],
-  coverImage: "/blog/background-removal-guide.svg",
+  coverImage: "/blog/remove-background-from-image-guide.svg",
   coverImageAlt: "A product image moving from a busy background to a transparent background",
   readingTime: "6 min read",
   published: true,
@@ -70,7 +70,7 @@ export const howToRemoveBackgroundFromImage: BlogPost = {
     },
     {
       type: "image",
-      src: "/blog/background-removal-guide.svg",
+      src: "/blog/remove-background-from-image-guide.svg",
       alt: "Illustration showing an uploaded image becoming a transparent PNG",
       width: 1200,
       height: 675

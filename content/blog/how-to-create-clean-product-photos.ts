@@ -10,7 +10,7 @@ export const howToCreateCleanProductPhotos: BlogPost = {
   author: "Remove.Services Editorial",
   category: "Product Photos",
   tags: ["product photo background", "ecommerce product images", "white background product photo"],
-  coverImage: "/blog/product-photo-guide.svg",
+  coverImage: "/blog/ecommerce-product-photo-background-removal-guide.svg",
   coverImageAlt: "Clean product photo cards prepared for an online store",
   readingTime: "7 min read",
   published: true,
@@ -53,7 +53,7 @@ export const howToCreateCleanProductPhotos: BlogPost = {
     },
     {
       type: "image",
-      src: "/blog/product-photo-guide.svg",
+      src: "/blog/ecommerce-product-photo-background-removal-guide.svg",
       alt: "Illustration of ecommerce product images with clean consistent backgrounds",
       width: 1200,
       height: 675

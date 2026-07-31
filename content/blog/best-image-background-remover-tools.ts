@@ -15,7 +15,7 @@ export const bestImageBackgroundRemoverTools: BlogPost = {
     "transparent PNG",
     "product photo tools"
   ],
-  coverImage: "/blog/best-background-remover-tools-cover.png",
+  coverImage: "/blog/best-image-background-remover-tools-2026-cover.png",
   coverImageAlt:
     "A realistic desk setup showing product photo background removal on a laptop",
   readingTime: "9 min read",

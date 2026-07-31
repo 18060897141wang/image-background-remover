@@ -10,7 +10,7 @@ export const howToMakeImageBackgroundTransparent: BlogPost = {
   author: "Remove.Services Editorial",
   category: "Transparent PNG",
   tags: ["transparent background", "transparent PNG", "make image background transparent"],
-  coverImage: "/blog/transparent-png-guide.svg",
+  coverImage: "/blog/make-image-background-transparent-guide.svg",
   coverImageAlt: "A transparent checkerboard canvas behind a clean image cutout",
   readingTime: "6 min read",
   published: true,
@@ -53,7 +53,7 @@ export const howToMakeImageBackgroundTransparent: BlogPost = {
     },
     {
       type: "image",
-      src: "/blog/transparent-png-guide.svg",
+      src: "/blog/make-image-background-transparent-guide.svg",
       alt: "Illustration comparing a JPG white background with a transparent PNG",
       width: 1200,
       height: 675
